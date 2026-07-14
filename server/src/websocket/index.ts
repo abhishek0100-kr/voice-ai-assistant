@@ -23,7 +23,9 @@ export const initWebSocketServer = (httpServer: HttpServer): WebSocketServer => 
       try {
         const data = JSON.parse(message.toString());
         
-        if (data.type === 'ping') {
+        if (data.event === 'audio-stream') {
+          console.log(`📥 Incoming audio packet received: ${data.data.slice(0, 24)}... (${data.data.length} bytes)`);
+        } else if (data.type === 'ping') {
           ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
         }
       } catch (error) {
