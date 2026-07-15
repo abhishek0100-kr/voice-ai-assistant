@@ -30,11 +30,14 @@ export const useAudioStream = () => {
           pcmBuffer[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
         }
 
-        const binaryString = Array.from(new Uint8Array(pcmBuffer.buffer), (byte) =>
-          String.fromCharCode(byte)
-        ).join('');
+        const uint8Buffer = new Uint8Array(pcmBuffer.buffer);
+        let binaryString = '';
+        const chunkLength = uint8Buffer.length;
+        for (let i = 0; i < chunkLength; i++) {
+          binaryString += String.fromCharCode(uint8Buffer[i]);
+        }
+        
         const base64Chunk = btoa(binaryString);
-
         onAudioChunk(base64Chunk);
       };
 

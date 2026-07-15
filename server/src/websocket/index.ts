@@ -1,5 +1,6 @@
 import { Server as HttpServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
+import { GeminiLiveManager } from './gemini';
 
 export const initWebSocketServer = (httpServer: HttpServer): WebSocketServer => {
   const wss = new WebSocketServer({ noServer: true });
@@ -19,12 +20,17 @@ export const initWebSocketServer = (httpServer: HttpServer): WebSocketServer => 
   wss.on('connection', (ws: WebSocket) => {
     console.log('🔌 Client established a stateful transport stream handshake');
 
+    const geminiManager = new GeminiLiveManager(ws);
+    geminiManager.connect();
+
     ws.on('message', (message: string) => {
       try {
         const data = JSON.parse(message.toString());
         
         if (data.event === 'audio-stream') {
-          console.log(`📥 Incoming audio packet received: ${data.data.slice(0, 24)}... (${data.data.length} bytes)`);
+          geminiManager.sendAudioChunk(data.data);
+        } else if (data.event === 'audio-end') {
+          geminiManager.triggerFallbackExecution();
         } else if (data.type === 'ping') {
           ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
         }
@@ -35,10 +41,12 @@ export const initWebSocketServer = (httpServer: HttpServer): WebSocketServer => 
 
     ws.on('close', () => {
       console.log('❌ Client closed transport stream connection channel');
+      geminiManager.disconnect();
     });
 
     ws.on('error', (error) => {
       console.error('⚠️ Stream internal network fault:', error.message);
+      geminiManager.disconnect();
     });
   });
 

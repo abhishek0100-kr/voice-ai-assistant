@@ -4,13 +4,15 @@ import { useAudioStream } from './hooks/useAudioStream';
 import { useWebSocket } from './hooks/useWebSocket';
 
 export default function Home() {
-  const { isConnected, sendAudioFrame } = useWebSocket('ws://localhost:8080/stream');
+  const { isConnected, sendAudioFrame, sendAudioEnd, interruptPlayback } = useWebSocket('ws://localhost:8080/stream');
   const { isRecording, startRecording, stopRecording } = useAudioStream();
 
   const handleToggleStream = () => {
     if (isRecording) {
       stopRecording();
+      sendAudioEnd();
     } else {
+      interruptPlayback();
       startRecording((base64Data: string) => {
         sendAudioFrame(base64Data);
       });
