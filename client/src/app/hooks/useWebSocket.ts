@@ -12,7 +12,7 @@ export const useWebSocket = (url: string) => {
   const initAudioContext = useCallback(() => {
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
-        sampleRate: 16000
+        sampleRate: 24000
       });
       nextPlaybackTimeRef.current = audioContextRef.current.currentTime;
     }
@@ -47,16 +47,22 @@ export const useWebSocket = (url: string) => {
       float32Buffer[i] = int16Buffer[i] / 32768.0;
     }
 
-    const audioBuffer = ctx.createBuffer(1, float32Buffer.length, 16000);
+    const audioBuffer = ctx.createBuffer(1, float32Buffer.length, 24000);
     audioBuffer.copyToChannel(float32Buffer, 0);
 
     const source = ctx.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(ctx.destination);
 
-    const startTime = Math.max(nextPlaybackTimeRef.current, ctx.currentTime);
-    source.start(startTime);
-    nextPlaybackTimeRef.current = startTime + audioBuffer.duration;
+    const lookAheadWindow = 0.015;
+    const currentTime = ctx.currentTime;
+
+    if (nextPlaybackTimeRef.current < currentTime) {
+      nextPlaybackTimeRef.current = currentTime + lookAheadWindow;
+    }
+
+    source.start(nextPlaybackTimeRef.current);
+    nextPlaybackTimeRef.current += audioBuffer.duration;
   }, [initAudioContext]);
 
   const handleIncomingMessage = useCallback((event: MessageEvent) => {

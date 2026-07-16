@@ -119,7 +119,7 @@ export class GeminiLiveManager {
             speechConfig: {
               voiceConfig: {
                 prebuiltVoiceConfig: {
-                  voiceName: 'Aoede'
+                  voiceName: 'Puck'
                 }
               }
             }
@@ -165,10 +165,17 @@ export class GeminiLiveManager {
             speechConfig: {
               voiceConfig: {
                 prebuiltVoiceConfig: {
-                  voiceName: 'Aoede'
+                  voiceName: 'Puck'
                 }
               }
             }
+          },
+          systemInstruction: {
+            parts: [
+              {
+                text: 'You are Aether, a rapid, bright, highly energetic conversational companion. Do not speak quietly, hesitantly, or with a sotto voce tone. Respond with clear, natural, rapid inflection, varied pitch, and high-tempo articulation. Keep responses extremely short and direct.'
+              }
+            ]
           }
         }
       };
