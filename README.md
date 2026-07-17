@@ -165,12 +165,8 @@ Create a `.env` file inside the `server` directory.
 PORT=8080
 NODE_ENV=development
 CLIENT_URL=http://localhost:3000
-
-DATABASE_URL=your_database_url
-
 GEMINI_API_KEY=your_gemini_api_key
 ```
-
 ## Author
 
 **Abhishek Kumar**

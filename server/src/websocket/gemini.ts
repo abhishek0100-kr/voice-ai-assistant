@@ -92,6 +92,7 @@ export class GeminiLiveManager {
       const combinedBuffer = Buffer.concat(this.fallbackAudioBuffers);
       this.fallbackAudioBuffers = [];
       const base64Audio = combinedBuffer.toString('base64');
+      
 
       const restUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
       
